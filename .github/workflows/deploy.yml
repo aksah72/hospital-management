@@ -41,23 +41,21 @@ jobs:
           echo "${{ secrets.EC2_KEY }}" > ec2_key.pem
           chmod 600 ec2_key.pem
 
-      - name: Deploy on EC2 Server
+            - name: Deploy on EC2 Server
         run: |
           ssh -o StrictHostKeyChecking=no -i ec2_key.pem ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
-            echo "--- Pulling latest Docker image ---"
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/hospital-app:latest
 
-            echo "--- Stopping old container ---"
             sudo docker stop hospital-app || true
             sudo docker rm hospital-app || true
 
-            echo "--- Starting new container ---"
-            sudo docker run -d -p 80:3000 \
+            sudo docker run -d \
+              -p 80:3000 \
               -e MONGODB_URI="${{ secrets.MONGODB_URI }}" \
               -e SESSION_SECRET="${{ secrets.SESSION_SECRET }}" \
               --name hospital-app \
               ${{ secrets.DOCKERHUB_USERNAME }}/hospital-app:latest
 
-            echo "--- Cleaning old Docker resources ---"
             sudo docker system prune -f
           EOF
+
