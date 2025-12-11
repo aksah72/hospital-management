@@ -11,3 +11,5 @@ Dockerfile
 *.tfstate.backup
 .terraform.lock.hcl
 terraform.tfvars
+*.pem
+*.pub
